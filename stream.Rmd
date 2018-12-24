@@ -1,0 +1,61 @@
+---
+title: "Twitter Crawler"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages
+
+```{r}
+pacman::p_load(tidyverse, RSQLite, stringr, rtweet)
+```
+
+## Auth
+
+```{r}
+# createTokenNoBrowser <- function(appName, consumerKey, consumerSecret, 
+#                                 accessToken, accessTokenSecret) {
+#   app <- httr::oauth_app(appName, consumerKey, consumerSecret)
+#   params <- list(as_header = TRUE)
+#   credentials <- list(oauth_token = accessToken, 
+#                       oauth_token_secret = accessTokenSecret)
+#   token <- httr::Token1.0$new(endpoint = NULL, params = params, 
+#                               app = app, credentials = credentials)
+#   return(token)
+# }
+# 
+# twitter_token <- createTokenNoBrowser(
+#   'TwAn101', # NAme
+#   'x2W0bs2VlAPAZ7pmaxBS4M9it', # consumer_key
+#   'VbuZbSfjP0e9elQMlaMMxff29LhtuGCirWKPxvBIt5YzOu8l5y', #consumer_secret
+#   '948571571395973122-LXjobN91SH02s5GrqxPkPMocFdLBlmV', #access_token
+#   'g56MjmMLg3maXMHGTB9aC8nPx1cXxrcgVZGhqFgtw8iYv' # access_secret
+# )
+
+# consumer_key <- 'x2W0bs2VlAPAZ7pmaxBS4M9it'
+# consumer_secret <- 'VbuZbSfjP0e9elQMlaMMxff29LhtuGCirWKPxvBIt5YzOu8l5y'
+# access_token <- '948571571395973122-LXjobN91SH02s5GrqxPkPMocFdLBlmV'
+# access_secret <- 'g56MjmMLg3maXMHGTB9aC8nPx1cXxrcgVZGhqFgtw8iYv'
+# setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+twitter_token <- readRDS("twitter_token.rds")
+```
+
+
+## Twitter scraper
+
+```{r}
+while(T){
+  stream_tweets(
+    "realdonaldtrump,trump",
+    timeout = 10,
+    file_name = glue::glue("tmp/tmp_{Sys.time()}.json"),
+    parse = F,
+    token = twitter_token
+  )
+}
+```
+

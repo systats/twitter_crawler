@@ -1,0 +1,57 @@
+---
+title: "Database"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Packages
+
+```{r}
+pacman::p_load(tidyverse, RSQLite, jsonlite, rtweet)
+```
+
+
+## Save to Database
+
+```{r}
+is_not_list <- function(x) !is.list(x)
+
+while(T){
+  
+  process_files <- list.files("tmp") %>% 
+    paste0("tmp/", .) %>%
+    .[-length(.)]
+
+  processed <- process_files %>%
+    map_df(parse_stream) %>% 
+    select_if(is_not_list)
+  
+  tw_con <- dbConnect(SQLite(), "data/tw_database.db") 
+  
+  
+  RSQLite::dbWriteTable(tw_con, "my_table", processed, append = T) # if you want to initalize a new table remove append = T
+  
+  dbDisconnect(tw_con)
+  
+  process_files %>% walk(file.remove)
+  
+  Sys.sleep(20)
+}
+```
+
+
+## Access Database 
+
+```{r}
+tw_con <- dbConnect(SQLite(), "data/tw_database.db") 
+tw_con %>% 
+  tbl(glue::glue("my_table")) %>% 
+  as_tibble() 
+
+dbDisconnect(tw_con)
+```
+
